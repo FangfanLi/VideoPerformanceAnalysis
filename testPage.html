@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>YouTube test</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script>
+			function onSubmit() {
+		    	var name    = $('#name').val();
+		    	var network = $('#network').val();
+		    	var tether  = $('#tether > .btn.active').text();
+		    	var stoptime= $('#stoptime > .btn.active').text();
+		    	var quality = $('#quality > .btn.active').text();
+		    	var newUrl 	= [	"/home/fangfanli/youtubePlayerStats.html?",
+		    					"name="     , name,
+		    					"&tether="  , tether,
+		    					"&stoptime=", stoptime,
+		    					"&network=" , network,
+		    					"&quality=" , quality];
+
+		    	var newUrl 	= newUrl.join("");
+
+  			  	localStorage.setItem("name", name);
+
+
+  			  	if (tether == 'Yes'){
+			  		localStorage.setItem("tether", 1);
+			  	}
+			  	else if (tether == 'No'){
+			  		localStorage.setItem("tether", 0);
+			  	}
+			  	else {
+			  		localStorage.setItem("tether", -1);
+			  	}
+
+		  		localStorage.setItem("stoptime", stoptime);
+
+		  		localStorage.setItem("network", network);
+
+		    	window.location = newUrl;
+			}
+	  	</script>
+	</head>
+<body>
+
+<div class="container">
+	<h3>Please provide following info before running the test:</h3>
+  	<form role="form">
+
+	    <div class="form-group">
+	    	<div>
+				<label class="control-label" for="name">Name:</label>
+			    <input type="text" class="form-control" id="name" placeholder="Enter name">
+		    </div>
+	    </div>
+
+	    <div class="form-group">
+	    	<div>
+				<label class="control-label" for="network">Network:</label>
+			    <input type="text" class="form-control" id="network" placeholder="Wifi? Tmobile?">
+		    </div>
+	    </div>
+
+	    <div class="form-group">
+			<label class="control-label" for="tether">Are you tethering?</label>
+			<br>
+			<div id="tether" class="btn-group" data-toggle="buttons" style="width:100%">
+		  		<label id="tetheryes" style="width:33.33%" class="btn btn-default"><input type="radio" name="optradio">Yes</label>
+		  		<label id="tetherno"  style="width:33.33%" class="btn btn-default active"><input type="radio" name="optradio" checked="checked">No</label>
+		  		<label id="tetherNA"  style="width:33.33%" class="btn btn-default"><input type="radio" name="optradio" checked="checked">NA</label>
+			</div>
+	    </div>
+
+	    <div class="form-group">
+			<label class="control-label" for="stoptime">Test length?</label>
+			<small class="text-muted">In seconds.</small>
+			<br>
+			<div id="stoptime" class="btn-group" data-toggle="buttons" style="width:100%">
+		  		<label id="stoptime10" style="width:33.33%" class="btn btn-default"><input type="radio" name="optradio">10</label>
+		  		<label id="stoptime30" style="width:33.33%" class="btn btn-default active"><input type="radio" name="optradio" checked="checked">30</label>
+		  		<label id="stoptime60"  style="width:33.33%" class="btn btn-default"><input type="radio" name="optradio">60</label>
+			</div>
+	    </div>
+
+	    <div class="form-group">
+			<label class="control-label" for="quality">Desired quality?</label>
+			<small class="text-muted">Player will try to play at this quality.</small>
+			<br>
+			<div id="quality" class="btn-group" data-toggle="buttons" style="width:100%">
+				<label id="qualityAuto"  style="width:11.11%" class="btn btn-default"><input type="radio" name="optradio">auto</label>
+				<label id="quality144"   style="width:11.11%" class="btn btn-default"><input type="radio" name="optradio">tiny</label>
+				<label id="quality240"   style="width:11.11%" class="btn btn-default"><input type="radio" name="optradio">small</label>
+				<label id="quality360"   style="width:11.11%" class="btn btn-default"><input type="radio" name="optradio">medium</label>
+				<label id="quality480"   style="width:11.11%" class="btn btn-default"><input type="radio" name="optradio">large</label>
+		  		<label id="quality720"   style="width:11.11%" class="btn btn-default active"><input type="radio" name="optradio" checked="checked">hd720</label>
+		  		<label id="quality1080"  style="width:11.11%" class="btn btn-default"><input type="radio" name="optradio">hd1080</label>
+		  		<label id="quality1440"  style="width:11.11%" class="btn btn-default"><input type="radio" name="optradio">hd1440</label>
+		  		<label id="quality2160"  style="width:11.11%" class="btn btn-default"><input type="radio" name="optradio">hd2160</label>
+			</div>
+	    </div>
+
+	    <br>
+	    <button type="button" class="btn btn-default" style="width:100%" onclick="return onSubmit();">Run test</button>
+
+  </form>
+
+  	<script>
+			var name = localStorage.getItem("name");
+			if ((name != null) && (name != "null")) {
+				$('#name').val(name);
+			}
+
+			var network = localStorage.getItem("network");
+			if ((network != null) && (network != "null")) {
+				$('#network').val(network);
+			}
+
+			var tether = localStorage.getItem("tether");
+			if (tether !== null) {
+				if (parseInt(tether) == 1) {
+					$('#tetheryes').click();
+				}
+				else if (parseInt(tether) == -1) {
+					$('#tetherNA').click();
+				}
+			}
+
+			var stoptime = localStorage.getItem("stoptime");
+			if (stoptime !== null) {
+				if (parseInt(stoptime) == 60) {
+					$('#stoptime60').click();
+				}
+				else if (parseInt(stoptime) == 10) {
+					$('#stoptime10').click();
+				}
+				else {
+					$('#stoptime30').click();
+				}
+			}
+
+	</script>
+</div>
+
+</body>
+</html>
+
+
+
+
+
