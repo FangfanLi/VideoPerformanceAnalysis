@@ -56,6 +56,8 @@ This will send stats as a json file to a server. Minimal server:
 		    args[item[0]] = decodeURIComponent(item[1]);
 		  });
 
+		// Get the parameters
+
 	  	var stopTime 		= parseInt(args.stoptime) * 1000;
 	  	var tether          = args.tether
 	    var network  	   	= args.network;
@@ -86,9 +88,11 @@ This will send stats as a json file to a server. Minimal server:
 		localStorage.setItem("testID", testID.toString());
 
 		var datetime 		 = new Date().toGMTString('');
+		// events contains the QoE info, such as Paused, Buffering, Quality Changes etc.
 		var events 		 	 = [];
 		var started 		 = false;
 		var stopped 		 = false;
+		// This is the server that this page sends analysis results to
 		var ncServer		 = "http://replay-test-2.meddle.mobi:55556/";
 		var lat;
 		var lon;
@@ -96,7 +100,7 @@ This will send stats as a json file to a server. Minimal server:
 
     	var desiredWidth   = 1920;
     	var desiredheight  = 1080;
-    	var desiredVideoId = 'lGNXVhMLw8o';
+    	var desiredVideoId = 'D6tC1pyrsTM';
 
 	   /* navigator.__defineGetter__('userAgent', function(){
 	       return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.97 Safari/537.36";
@@ -323,7 +327,7 @@ This will send stats as a json file to a server. Minimal server:
       }
 
       function onMoreTests() {
-    	  window.location = "http://achtung.ccs.neu.edu/~arash/testPage.html";
+    	  window.location = "http://www.ccs.neu.edu/home/fangfanli/testPage.html";
       };
 
       function showResults(events) {

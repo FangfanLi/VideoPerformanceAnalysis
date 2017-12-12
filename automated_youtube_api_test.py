@@ -29,7 +29,6 @@ def runOne(name, tether, stoptime, network, quality, driver=None, userID=None, t
         exit = False
 
     url = 'http://www.ccs.neu.edu/home/fangfanli/youtubePlayerStats.html?name={}&tether={}&stoptime={}&network={}&quality={}'.format(name, tether, stoptime, network, quality)
-    # url     = 'http://achtung.ccs.neu.edu/~arash/youtubePlayerStats.html?name={}&stoptime={}&network={}&quality={}'.format(name, stoptime, network, quality)
 
     if userID:
         url += '&userID=' + userID

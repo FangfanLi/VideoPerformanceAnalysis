@@ -20,7 +20,7 @@ for file in sys.argv[1:]:
         assert(res['events'][0]['event'] == 'UNSTARTED')
         assert(res['events'][1]['event'] == 'BUFFERING')
         assert(res['events'][2]['event'] == 'QualityChange')
-        assert(res['events'][3]['event'] == 'PLAYING')
+        # assert(res['events'][3]['event'] == 'PLAYING')
     except:
         errors.append(file)
         continue
@@ -110,7 +110,7 @@ for q in sorted(results['On'].keys()):
                               round(numpy.average(results['Off'][q]['rebufferCount']), 2), 
                               round(numpy.average(results['On'][q]['bufferingTimeFrac']), 2),
                               round(numpy.average(results['Off'][q]['bufferingTimeFrac']), 2),
-                              '\\ \hline' 
+                              '\\ \hline'
                               ]))
                                   
     

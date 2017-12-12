@@ -6,14 +6,14 @@ results = {}
 for file in sys.argv[1:]:
 
     res = json.load(open(file, 'r'))
-    try:
-        assert(res['events'][0]['event'] == 'UNSTARTED')
-        assert(res['events'][1]['event'] == 'BUFFERING')
-        assert(res['events'][2]['event'] == 'QualityChange')
-        assert(res['events'][3]['event'] == 'PLAYING')
-    except:
-        errors.append(file)
-        continue
+    # try:
+    #     assert(res['events'][0]['event'] == 'UNSTARTED')
+    #     assert(res['events'][1]['event'] == 'BUFFERING')
+    #     assert(res['events'][2]['event'] == 'QualityChange')
+    #     assert(res['events'][3]['event'] == 'PLAYING')
+    # except:
+    #     errors.append(file)
+    #     continue
 
     network             = res['network']
     tether              = res['tether']
@@ -82,14 +82,14 @@ for file in sys.argv[1:]:
 
     print '\t'.join(map(str, [file.rpartition('/')[2], network, 'tether? ' + tether, timeToStartPlaying, desiredQuality, initialQuality, endQuality, qualityChangeCount, rebufferCount, finalFractionLoaded, bufferingTimeFrac, bufferingTime, playingTime]))
 
-
-print '\n\nErrors (First 4 events are not the expected!):'
-for file in errors:
-    print file
+#
+# print '\n\nErrors (First 4 events are not the expected!):'
+# for file in errors:
+#     print file
 
 
 print '\n\n Summary:'
-print '\t '.join(['timeToStartPlaying', 'qualityChangeCount', 'rebufferCount', 'finalFractionLoaded', 'bufferingTimeFrac', 'bufferingTime', 'playingTime'])
+print '\t '.join(['DesiredQuality','timeToStartPlaying', 'qualityChangeCount', 'rebufferCount', 'finalFractionLoaded', 'bufferingTimeFrac', 'bufferingTime', 'playingTime'])
 for q in sorted(results.keys()):
     print '\t\t & '.join(map(str, [q,
                                  round(numpy.average(results[q]['timeToStartPlaying'])/1000.0, 2),
@@ -98,6 +98,5 @@ for q in sorted(results.keys()):
                                  str(round(numpy.average(results[q]['finalFractionLoaded']), 2) * 100) + '%',
                                  str(round(numpy.average(results[q]['bufferingTimeFrac']), 2)) + '%',
                                  round(numpy.average(results[q]['bufferingTime']), 2),
-                                 round(numpy.average(results[q]['playingTime']), 2),
-                                 '\\ \hline'
+                                 round(numpy.average(results[q]['playingTime']), 2)
                                  ]))
