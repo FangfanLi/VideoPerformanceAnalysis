@@ -5,9 +5,10 @@ class Handler(tornado.web.RequestHandler):
     def post(self):
         data = json.loads(self.request.body)
         data['ip'] = self.request.remote_ip
-        print '\r\n NEW DATA', data, '\n'
         # CREATE A Directory for each userID
-        dirName = '/home/ubuntu/youtubePlayer_results/'+data['userID'] + data['network']
+        dirName = self.settings['resultsFolder'] + data['userID']
+        print '\r\n NEW DATA', data, '\n Results in directory', dirName
+
         if not os.path.isdir(dirName):
             os.makedirs(dirName)
 

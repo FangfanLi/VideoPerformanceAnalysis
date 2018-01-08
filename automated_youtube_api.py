@@ -147,7 +147,7 @@ def main():
     for i in range(rounds):
         for videoID in videoIDs:
             testID = str(i)
-            print '\t'.join(map(str, [i, quality, network, userID, videoID, testID]))
+            print '\t'.join(map(str, [testID, quality, network, userID, videoID]))
             runOne(tether, stoptime, network, quality, videoID=videoID, driver=driver, userID=userID, testID=testID, doDumps=doDumps)
             time.sleep(3)
 
