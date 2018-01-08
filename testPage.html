@@ -9,22 +9,17 @@
 		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 		<script>
 			function onSubmit() {
-		    	var name    = $('#name').val();
 		    	var network = $('#network').val();
 		    	var tether  = $('#tether > .btn.active').text();
 		    	var stoptime= $('#stoptime > .btn.active').text();
 		    	var quality = $('#quality > .btn.active').text();
 		    	var newUrl 	= [	"/home/fangfanli/youtubePlayerStats.html?",
-		    					"name="     , name,
 		    					"&tether="  , tether,
 		    					"&stoptime=", stoptime,
 		    					"&network=" , network,
 		    					"&quality=" , quality];
 
 		    	var newUrl 	= newUrl.join("");
-
-  			  	localStorage.setItem("name", name);
-
 
   			  	if (tether == 'Yes'){
 			  		localStorage.setItem("tether", 1);
@@ -52,15 +47,8 @@
 
 	    <div class="form-group">
 	    	<div>
-				<label class="control-label" for="name">Name:</label>
-			    <input type="text" class="form-control" id="name" placeholder="Enter name">
-		    </div>
-	    </div>
-
-	    <div class="form-group">
-	    	<div>
 				<label class="control-label" for="network">Network:</label>
-			    <input type="text" class="form-control" id="network" placeholder="Wifi? Tmobile?">
+			    <input type="text" class="form-control" id="network" placeholder="Wifi? Tmobile? Verizon?">
 		    </div>
 	    </div>
 
@@ -108,10 +96,6 @@
   </form>
 
   	<script>
-			var name = localStorage.getItem("name");
-			if ((name != null) && (name != "null")) {
-				$('#name').val(name);
-			}
 
 			var network = localStorage.getItem("network");
 			if ((network != null) && (network != "null")) {

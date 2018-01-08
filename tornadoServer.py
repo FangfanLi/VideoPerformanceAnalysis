@@ -5,8 +5,13 @@ class Handler(tornado.web.RequestHandler):
     def post(self):
         data = json.loads(self.request.body)
         data['ip'] = self.request.remote_ip
-        print data, '\n'
-        with open('/home/ubuntu/youtubePlayer_results/youtubeAPI_{}_{}.json'.format(data['userID'], data['testID']), 'w+') as f:
+        print '\r\n NEW DATA', data, '\n'
+        # CREATE A Directory for each userID
+        dirName = '/home/ubuntu/youtubePlayer_results/'+data['userID'] + data['network']
+        if not os.path.isdir(dirName):
+            os.makedirs(dirName)
+
+        with open(dirName+'/youtubeAPI_{}_{}_{}_{}.json'.format(data['userID'], data['network'], data['videoID'], data['testID']), 'w+') as f:
             json.dump(data, f)
 
 resultsFolder = '/home/ubuntu/youtubePlayer_results/'
@@ -20,4 +25,5 @@ application.settings = {'resultsFolder'  : resultsFolder,
 
 application.listen(55556)
 
+print '\r\n Server Running '
 tornado.ioloop.IOLoop.instance().start()

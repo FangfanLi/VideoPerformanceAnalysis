@@ -66,7 +66,7 @@ This will send stats as a json file to a server. Minimal server:
 	  	var testID 			= args.testID;
 
 	  	if (userID) {
-		  	console.log('userID1:', userID);
+		  	console.log('userID:', userID);
 	  		localStorage.setItem("userID", userID);
 	  	}
 
@@ -100,7 +100,13 @@ This will send stats as a json file to a server. Minimal server:
 
     	var desiredWidth   = 1920;
     	var desiredheight  = 1080;
-    	var desiredVideoId = 'D6tC1pyrsTM';
+    	<!--This can be given as an Input when we want to analysis the top 50 video, just give the top 50 video IDs as inputs-->
+
+    	var desiredVideoId = args.videoID
+
+    	if (!desiredVideoId){
+    	    var desiredVideoId = 'D6tC1pyrsTM';
+    	}
 
 	   /* navigator.__defineGetter__('userAgent', function(){
 	       return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.97 Safari/537.36";
@@ -266,7 +272,6 @@ This will send stats as a json file to a server. Minimal server:
 
       	  	var results = {'userID'   : userID,
       	  				   'testID'   : testID,
-      	  				   'name'     : name,
       			  		   'datetime' : datetime,
       			  		   'lon'	  : lon,
       			  		   'lat'	  : lat,
