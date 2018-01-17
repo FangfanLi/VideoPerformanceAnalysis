@@ -6,7 +6,7 @@ Test Youtube streaming performance on your network by automative streaming Youtu
 
 Client: where the tests will be running and the network to test
 
-Web Server: where the testPage is placed (e.g., www.testserver.com)
+Web Server: where the testPage is placed (e.g., testserver.com)
 
 Analysis Server: where the analysis server runs and the QOE stats collected (e.g., analysis.com)
 
