@@ -42,15 +42,12 @@ Where the first parameter specifies which network is being tested ('WiFi'), the 
 
 2. When the experiment is running, the script opens up the browser and loads video repeatively.
 
-3. The output should look like this:
+3. The output should look something like this:
 ```
 videoID	 & initialQuality	 & endQuality	 & timeToStartPlaying	 & qualityChangeCount	 & rebufferCount	 & finalFractionLoaded	 & bufferingTimeFrac	 & bufferingTime	 & playingTime
 ```
 ```
-RgKAFK5djSk	 & {u'hd1080': 0.8, u'hd720': 0.2}	 & {u'hd1080': 1.0}	 & 1.78	 & 1.2	 & 0.2	 & 51.0%	 & 3.22%	 & 1.98	 & 59.8
-```
-```
-kJQP7kiw5Fk	 & {u'medium': 0.4, u'hd720': 0.6}	 & {u'hd1080': 0.2, u'hd720': 0.8}	 & 1.74	 & 2.8	 & 0.8	 & 36.0%	 & 4.04%	 & 2.51 & 59.26
+kJQP7kiw5Fk	 & {u'hd1080': 0.7, u'medium': 0.3}	 & {u'hd1080': 1.0}	 & 1.13	 & 1.3	 & 0.0	 & 25.0%	 & 3.83%	 & 1.2	 & 30.0
 ```
 
 #### b. Interpret the result
@@ -63,8 +60,8 @@ The rest of the stats should be self explanatory by their names.
 
 Let's take the example output above, where the top two videos are tested, each for 5 times on a WIFI network.
 
-The result for videoID *'RgKAFK5djSk'* shows that the video starts with 
-*hd1080* 80% and *hd720* 20% of the time; the video always end in *hd1080* quality; time before the video starts averages to *1.78* seconds; on average the quality changes *1.2* times during the test; on average the video buffers *0.2* times; at the end of the test period (60s), on average *51%* of the video is already loaded; buffering time only counts for *3%* of the streaming period; buffering time on average is *1.98* seconds.
+The result for videoID *'kJQP7kiw5Fk'* shows that the video starts with 
+*hd1080* 70% and *medium* 30% of the time; the video always end in *hd1080* quality; time before the video starts averages to *1.13* seconds; on average the quality changes *1.3* times during the test; on average the video buffers *0.0* times; at the end of the test period (30s), on average *25%* of the video is already loaded; buffering time only counts for *3.83%* of the streaming period; buffering time on average is *1.2* seconds.
 
 #### c. Tunable parameters
 

@@ -107,8 +107,6 @@ def analyzeQoE(dir):
         print '\t'.join(map(str, [file.rpartition('/')[2], network, 'tether? ' + tether, timeToStartPlaying, desiredQuality, initialQuality, endQuality, qualityChangeCount, rebufferCount, finalFractionLoaded, bufferingTimeFrac, bufferingTime, playingTime]))
 
 
-    print '\r\n Summary:'
-    print '\t & '.join(['videoID', 'initialQuality', 'endQuality', 'timeToStartPlaying', 'qualityChangeCount', 'rebufferCount', 'finalFractionLoaded', 'bufferingTimeFrac', 'bufferingTime', 'playingTime'])
     return results
 
 

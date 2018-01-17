@@ -204,6 +204,10 @@ def main():
     analyzer = analyzerI('replay-test-2.meddle.mobi',55556)
     results = analyzer.getSingleResult(userID)
     results = results['response']
+    print '\r\n Summary:'
+    print '\t & '.join(
+        ['videoID', 'initialQuality', 'endQuality', 'timeToStartPlaying', 'qualityChangeCount', 'rebufferCount',
+         'finalFractionLoaded', 'bufferingTimeFrac', 'bufferingTime', 'playingTime'])
 
     for q in sorted(results.keys()):
         iQualities = getQualityPercentage(results[q]['initialQuality'])
