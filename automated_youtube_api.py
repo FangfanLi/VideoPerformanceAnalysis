@@ -17,7 +17,7 @@ Example usage:
     python automated_youtube_api.py [Network] [YES or NO] [Chrome OR Firefox]
 '''
 
-import time, sys, os, random, string, subprocess
+import time, sys, os, random, string, subprocess, urllib2, json,urllib, numpy
 from selenium import webdriver
 from urllib2 import urlopen
 from BeautifulSoup import BeautifulSoup
@@ -30,6 +30,54 @@ The wikipedia page keeps track of the top 100 most viewed Youtube videos
 Input : n
 Output : a list of n most viewed Youtube video IDs 
 '''
+
+class analyzerI(object):
+    '''
+    This class contains all the methods to interact with the analyzer server
+    '''
+    def __init__(self, ip, port):
+        self.path = ('http://'
+                     + ip
+                     + ':'
+                     + str(port))
+
+    def getSingleResult(self, userID):
+        '''
+        Send a GET request to get result for a given userID
+        '''
+        # userID specifies the test
+        data = {'userID':userID}
+
+        res = self.sendRequest('GET',data=data)
+        return res
+
+    def sendRequest(self, method, data=''):
+        '''
+        Sends a single request to analyzer server
+        '''
+        data = urllib.urlencode(data)
+
+        if method.upper() == 'GET':
+            req = urllib2.Request(self.path + '?' + data)
+
+        elif method.upper() == 'POST':
+            req  = urllib2.Request(self.path, data)
+
+        res = urllib2.urlopen(req).read()
+        return json.loads(res)
+
+def getQualityPercentage(qualities):
+    rQualities = {}
+    for quality in qualities:
+        if rQualities.has_key(quality):
+            rQualities[quality] += 1
+        else:
+            rQualities[quality] = 1
+
+    for quality in rQualities:
+        rQualities[quality] = float(rQualities[quality])/float(len(qualities))
+
+    return rQualities
 
 def getTopYoutubeVideoIDs(n):
     if n > 100:
@@ -113,9 +161,8 @@ def main():
     quality = 'auto'
 
     # This list contains the videoIDs to be tested, can be replaced with the top 50 list
-    videoIDs = ['PsrPTpg6mNo', 'x1QTc5YeO6w']
 
-    videoIDs = getTopYoutubeVideoIDs(2)
+    videoIDs = getTopYoutubeVideoIDs(1)
 
     # unique for a set of tests
     userID = random_ascii_by_size(10)
@@ -123,18 +170,18 @@ def main():
     # Whether do tcpdump
     doDumps = False
     # Running time for each video
-    stoptime = '10'
+    stoptime = '30'
     # Rounds of test for each video
     rounds = 5
 
     if browser == 'Chrome':
-        userDir       = 'UserDir'
-        chromeOptions = webdriver.ChromeOptions()
-        options       = ['--user-data-dir={}'.format(userDir), '--disable-background-networking', '--disable-default-apps', '--disable-extensions']
+        # userDir       = 'UserDir'
+        # chromeOptions = webdriver.ChromeOptions()
+        # options       = ['--user-data-dir={}'.format(userDir), '--disable-background-networking', '--disable-default-apps', '--disable-extensions']
 
-        for o in options:
-            chromeOptions.add_argument(o)
-        driver = webdriver.Chrome('/Users/neufan/Downloads/chromedriver',chrome_options=chromeOptions)
+        # for o in options:
+        #     chromeOptions.add_argument(o)
+        driver = webdriver.Chrome('/Users/neufan/Downloads/chromedriver')
 
     elif browser == 'Firefox':
         driver = webdriver.Firefox(executable_path='/Users/neufan/Downloads/geckodriver')
@@ -153,6 +200,24 @@ def main():
 
     if driver:
         driver.quit()
+    # analyzerI
+    analyzer = analyzerI('replay-test-2.meddle.mobi',55556)
+    results = analyzer.getSingleResult(userID)
+    results = results['response']
+
+    for q in sorted(results.keys()):
+        iQualities = getQualityPercentage(results[q]['initialQuality'])
+        eQualities = getQualityPercentage(results[q]['endQuality'])
+
+        print '\t & '.join(map(str, [q, iQualities, eQualities,
+                                 round(numpy.average(results[q]['timeToStartPlaying'])/1000.0, 2),
+                                 round(numpy.average(results[q]['qualityChangeCount']), 2),
+                                 round(numpy.average(results[q]['rebufferCount']), 2),
+                                 str(round(numpy.average(results[q]['finalFractionLoaded']), 2) * 100) + '%',
+                                 str(round(numpy.average(results[q]['bufferingTimeFrac']), 2)) + '%',
+                                 round(numpy.average(results[q]['bufferingTime']), 2),
+                                 round(numpy.average(results[q]['playingTime']), 2)
+                                 ]))
 
 if __name__ == "__main__":
     main()
