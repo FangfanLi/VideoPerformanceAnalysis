@@ -36,7 +36,7 @@ driver = webdriver.Firefox(executable_path='/path/to/geckodriver')
 
 1. On the client machine, run *automated_youtube_api.py*
 ```python
-sudo python automated_youtube_api.py WiFi NO Firefox
+python automated_youtube_api.py WiFi NO Firefox
 ```
 Where the first parameter specifies which network is being tested ('WiFi'), the second parameter is whether tethered ('NO'), the third parameter is which browser to use for testing ('Firefox'). The program prints out the meta data for each test it performs: testID, specified resolution, network, userID, videoID.
 
@@ -96,11 +96,11 @@ var newUrl = ["/the/directory/to/youtubePlayerStats.html?" ...]
 ```
 var ncServer = "http://analysis.com:55556/";
 ```
-4. Deploy *tornadoServer.py* on the Analysis Server and in the script, change the variable *resultsFolder* to where you want the results to be kept.
+4. Deploy *tornadoServer.py* on the Analysis Server and in the script, change the variable *resultsFolder* to where you want the results to be kept, and start it with *python tornadoServer.py*.
 ```
 resultsFolder = '/home/ubuntu/youtubePlayer_results/'
 ```
-5. In *runOne()* method, update the url to where the testPage is hosted.
+5. In *automated\_youtube\_api.py*, find *runOne()* method, update the url to where the testPage is hosted.
 ```
 url = 'http://www.testserver.com/youtubePlayerStats.html?tether={}&stoptime={}&network={}&quality={}&videoID={}'.format(tether, stoptime, network, quality,videoID)
 ```

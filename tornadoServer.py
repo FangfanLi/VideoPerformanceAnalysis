@@ -1,7 +1,7 @@
 import os, json
 import tornado.ioloop, tornado.web
 
-import sys, json, numpy,os
+import sys, json, numpy,os, time, subprocess
 
 errors  = []
 results = {}
@@ -29,7 +29,7 @@ playing Time (averaged)
 # Example: ['hd1080', 'hd720'] ---> {'hd1080':0.5, 'hd720':0.5}
 
 def analyzeQoE(dir):
-    results = []
+    results = {}
 
     for file in os.listdir(dir):
 
@@ -107,6 +107,15 @@ def analyzeQoE(dir):
 
         print '\t'.join(map(str, [file.rpartition('/')[2], network, 'tether? ' + tether, timeToStartPlaying, desiredQuality, initialQuality, endQuality, qualityChangeCount, rebufferCount, finalFractionLoaded, bufferingTimeFrac, bufferingTime, playingTime]))
 
+    # move the result directory to a timstamped subdirectory
+    incomingDate = time.strftime("%Y-%m-%d", time.gmtime())
+    resultDir= dir.rpartition('/')[0]
+    testID = dir.rsplit('/')[-1]
+    timestampedDir = resultDir + '/' + incomingDate
+    newdir = timestampedDir + '/' + testID
+    if not os.path.isdir(timestampedDir):
+        os.makedirs(timestampedDir)
+    subprocess.call('mv ' + dir + ' ' + newdir, stdout=subprocess.PIPE, shell=True)
 
     return results
 
