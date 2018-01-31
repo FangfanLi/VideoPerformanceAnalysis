@@ -75,7 +75,7 @@ def getQualityPercentage(qualities):
             rQualities[quality] = 1
 
     for quality in rQualities:
-        rQualities[quality] = float(rQualities[quality])/float(len(qualities))
+        rQualities[quality] = "{0:.2f}".format(float(rQualities[quality])/float(len(qualities)))
 
     return rQualities
 
@@ -194,7 +194,7 @@ def main():
     for i in range(rounds):
         for videoID in videoIDs:
             testID = str(i)
-            print '\t'.join(map(str, [testID, quality, network, userID, videoID]))
+            print '\t'.join(map(str, [testID, quality, network, browser, userID, videoID]))
             runOne(tether, stoptime, network, quality, videoID=videoID, driver=driver, userID=userID, testID=testID, doDumps=doDumps)
             time.sleep(3)
 

@@ -29,6 +29,7 @@ playing Time (averaged)
 # Example: ['hd1080', 'hd720'] ---> {'hd1080':0.5, 'hd720':0.5}
 
 def analyzeQoE(dir):
+    results = []
 
     for file in os.listdir(dir):
 
