@@ -19,6 +19,7 @@ Example usage:
 
 import time, sys, os, random, string, subprocess, urllib2, json,urllib, numpy
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from urllib2 import urlopen
 from BeautifulSoup import BeautifulSoup
 
@@ -76,6 +77,20 @@ def getQualityPercentage(qualities):
 
     for quality in rQualities:
         rQualities[quality] = "{0:.2f}".format(float(rQualities[quality])/float(len(qualities)))
+
+    return rQualities
+
+def getQualityPeriod(multiTestsQualities):
+    rQualities = {}
+    numTests = len(multiTestsQualities)
+    for singleTestQualities in multiTestsQualities:
+        for quality in singleTestQualities.keys():
+            if not rQualities.has_key(quality):
+                rQualities[quality] = 0
+            rQualities[quality] += singleTestQualities[quality]
+
+    for quality in rQualities:
+        rQualities[quality] = round(rQualities[quality]/float(numTests),2)
 
     return rQualities
 
@@ -168,7 +183,7 @@ def main():
     userID = random_ascii_by_size(10)
 
     # Whether do tcpdump
-    doDumps = False
+    doDumps = True
     # Running time for each video
     stoptime = '30'
     # Rounds of test for each video
@@ -181,7 +196,9 @@ def main():
 
         # for o in options:
         #     chromeOptions.add_argument(o)
-        driver = webdriver.Chrome('/Users/neufan/Downloads/chromedriver')
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--enable-quic")
+        driver = webdriver.Chrome('/Users/neufan/Downloads/chromedriver', chrome_options = chrome_options)
 
     elif browser == 'Firefox':
         driver = webdriver.Firefox(executable_path='/Users/neufan/Downloads/geckodriver')
@@ -198,22 +215,23 @@ def main():
             runOne(tether, stoptime, network, quality, videoID=videoID, driver=driver, userID=userID, testID=testID, doDumps=doDumps)
             time.sleep(3)
 
-    if driver:
-        driver.quit()
+    # if driver:
+    #     driver.quit()
     # analyzerI
     analyzer = analyzerI('replay-test-2.meddle.mobi',55556)
     results = analyzer.getSingleResult(userID)
     results = results['response']
     print '\r\n Summary:'
     print '\t & '.join(
-        ['videoID', 'initialQuality', 'endQuality', 'timeToStartPlaying', 'qualityChangeCount', 'rebufferCount',
+        ['videoID', 'initialQuality', 'endQuality', 'timeInDiffQualities', 'timeToStartPlaying', 'qualityChangeCount', 'rebufferCount',
          'finalFractionLoaded', 'bufferingTimeFrac', 'bufferingTime', 'playingTime'])
 
     for q in sorted(results.keys()):
         iQualities = getQualityPercentage(results[q]['initialQuality'])
         eQualities = getQualityPercentage(results[q]['endQuality'])
+        dQualities = getQualityPeriod(results[q]['multiTestsQualities'])
 
-        print '\t & '.join(map(str, [q, iQualities, eQualities,
+        print '\t & '.join(map(str, [q, iQualities, eQualities, dQualities,
                                  round(numpy.average(results[q]['timeToStartPlaying'])/1000.0, 2),
                                  round(numpy.average(results[q]['qualityChangeCount']), 2),
                                  round(numpy.average(results[q]['rebufferCount']), 2),
