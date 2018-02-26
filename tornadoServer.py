@@ -62,6 +62,13 @@ def analyzeQoE(dir):
 
         diffQualitiesPeriod = {}
 
+        # Buffering events list, which contains all qualities and buffering events, e.g.,
+        # ['Start buffering', u'Quality changes to medium after buffering for 1.136 seconds', 'Video buffered for 2.495 seconds',
+        # u'Quality changes to large after playing for 3.766 seconds', '4.516 seconds later after the previous quality change, buffering starts',
+        # 'Video buffered for 1.841 seconds']
+
+        bEvents = []
+
         for e in res['events']:
             if e['event'] == 'QualityChange':
                 # Calculate previous quality time
@@ -72,13 +79,20 @@ def analyzeQoE(dir):
                 diffQualitiesPeriod[endQuality] += round(etime/1000.0, 3)
                 endQuality     = e['event.data']
                 qualityChangeCount += 1
+                bEvents.append('Quality changes to ' + endQuality + ' after ' + mode + ' for ' + str(round((e['time'] - lastTime) / 1000.0, 3)) + ' seconds')
             elif e['event'] == 'BUFFERING':
                 rebufferCount += 1
                 playingTime   += (e['time'] - lastTime)
                 lastTime       = e['time']
                 mode           = 'buffering'
+                if (lastTime - lastQualityStartsAT) > 0:
+                    bEvents.append(str(round((lastTime - lastQualityStartsAT) / 1000.0, 3)) + ' seconds later after the previous quality change, buffering starts')
+                # ELSE, this is the start of the video
+                else:
+                    bEvents.append('Start buffering')
             elif e['event'] == 'PLAYING':
                 bufferingTime += (e['time'] - lastTime)
+                bEvents.append('Video buffered for ' + str(round((e['time'] - lastTime) / 1000.0, 3)) + ' seconds')
                 lastTime       = e['time']
                 mode           = 'playing'
 
@@ -115,7 +129,9 @@ def analyzeQoE(dir):
         try:
             results[videoID]
         except KeyError:
-            results[videoID] = {'timeToStartPlaying':[], 'initialQuality':[], 'endQuality':[], 'qualityChangeCount':[], 'rebufferCount':[], 'finalFractionLoaded':[], 'bufferingTimeFrac':[], 'bufferingTime':[], 'playingTime':[], 'multiTestsQualities':[]}
+            results[videoID] = {'timeToStartPlaying':[], 'initialQuality':[], 'endQuality':[], 'qualityChangeCount':[],
+                                'rebufferCount':[], 'finalFractionLoaded':[], 'bufferingTimeFrac':[], 'bufferingTime':[],
+                                'playingTime':[], 'multiTestsQualities':[], 'bEvents':[]}
         finally:
             results[videoID]['timeToStartPlaying'].append(timeToStartPlaying)
             results[videoID]['initialQuality'].append(initialQuality)
@@ -127,6 +143,7 @@ def analyzeQoE(dir):
             results[videoID]['bufferingTime'].append(bufferingTime)
             results[videoID]['playingTime'].append(playingTime)
             results[videoID]['multiTestsQualities'].append(diffQualitiesPeriod)
+            results[videoID]['bEvents'].append(bEvents)
 
     # move the result directory to a timstamped subdirectory
     incomingDate = time.strftime("%Y-%m-%d", time.gmtime())
