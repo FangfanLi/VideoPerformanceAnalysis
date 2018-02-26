@@ -19,6 +19,8 @@ Example usage:
 
 import time, sys, os, random, string, subprocess, urllib2, json,urllib, numpy
 from selenium import webdriver
+from selenium.webdriver import ActionChains
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
 from urllib2 import urlopen
 from BeautifulSoup import BeautifulSoup
@@ -130,7 +132,6 @@ def random_ascii_by_size(size):
     return ''.join(random.choice(string.ascii_letters + string.digits) for x in range(size))
 
 def runOne(tether, stoptime, network, quality, videoID=None, driver=None, userID=None, testID=None, doDumps=False):
-
     url = 'http://www.ccs.neu.edu/home/fangfanli/youtubePlayerStats.html?tether={}&stoptime={}&network={}&quality={}&videoID={}'.format(tether, stoptime, network, quality,videoID)
 
     if userID:
@@ -148,17 +149,22 @@ def runOne(tether, stoptime, network, quality, videoID=None, driver=None, userID
         dumpName = 'dump_youtubeAPI_{}_{}_{}_{}.pcap'.format(userID, network, videoID, testID)
         command  = ['sudo','tcpdump', '-nn', '-B', str(131072), '-w', dirName + dumpName]
         pID      = subprocess.Popen(command)
-        
+
     driver.get(url)
-    
+
     driver.find_element_by_id('player').click()
-    
+
+    # The next two lines opens a right click drop down menu, which contains option 'stats for nerds'
+    # actionChains = ActionChains(driver)
+    # actionChains.move_to_element(driver.find_element_by_id('player')).context_click().perform()
+    # Need to then select 'stats for nerds' element, selecting element from a drop down menu is not super straight forward though
+
     while True:
         status = driver.execute_script("return localStorage.getItem('status');")
         if status == 'done':
             break
         time.sleep(1)
-    
+
     if doDumps:
         pID.terminate()
 
@@ -215,13 +221,15 @@ def main():
             runOne(tether, stoptime, network, quality, videoID=videoID, driver=driver, userID=userID, testID=testID, doDumps=doDumps)
             time.sleep(3)
 
-    # if driver:
-    #     driver.quit()
+    if driver:
+        driver.quit()
     # analyzerI
     analyzer = analyzerI('replay-test-2.meddle.mobi',55556)
     results = analyzer.getSingleResult(userID)
     results = results['response']
+
     print '\r\n Summary:'
+
     print '\t & '.join(
         ['videoID', 'initialQuality', 'endQuality', 'timeInDiffQualities', 'timeToStartPlaying', 'qualityChangeCount', 'rebufferCount',
          'finalFractionLoaded', 'bufferingTimeFrac', 'bufferingTime', 'playingTime'])
@@ -240,6 +248,8 @@ def main():
                                  round(numpy.average(results[q]['bufferingTime']), 2),
                                  round(numpy.average(results[q]['playingTime']), 2)
                                  ]))
+
+        print '\r\n All quality change and buffering events ', results[q]['bEvents'], '\r\n'
 
 if __name__ == "__main__":
     main()
