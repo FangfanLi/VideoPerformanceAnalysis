@@ -189,7 +189,7 @@ def main():
     userID = random_ascii_by_size(10)
 
     # Whether do tcpdump
-    doDumps = True
+    doDumps = False
     # Running time for each video
     stoptime = '30'
     # Rounds of test for each video
