@@ -54,6 +54,8 @@ def analyzeQoE(dir):
 
         rebufferCount       = 0
         qualityChangeCount  = 0
+        # The fist event is always unstarted, consider the start of the buffering as the start of the analysis, which is res['events'][1]
+        initialTime = res['events'][1]['time']
 
         bufferingTime       = 0
         playingTime         = 0
@@ -63,6 +65,7 @@ def analyzeQoE(dir):
         diffQualitiesPeriod = {}
 
         # Buffering events list, which contains all qualities and buffering events, e.g.,
+        # event : timestamp (relative to the very first event)
         # ['Start buffering', u'Quality changes to medium after buffering for 1.136 seconds', 'Video buffered for 2.495 seconds',
         # u'Quality changes to large after playing for 3.766 seconds', '4.516 seconds later after the previous quality change, buffering starts',
         # 'Video buffered for 1.841 seconds']
@@ -79,20 +82,16 @@ def analyzeQoE(dir):
                 diffQualitiesPeriod[endQuality] += round(etime/1000.0, 3)
                 endQuality     = e['event.data']
                 qualityChangeCount += 1
-                bEvents.append('Quality changes to ' + endQuality + ' after ' + mode + ' for ' + str(round((e['time'] - lastTime) / 1000.0, 3)) + ' seconds')
+                bEvents.append('Quality changes to ' + endQuality + ' : ' + str(round((e['time'] - initialTime)/1000.0, 3)))
             elif e['event'] == 'BUFFERING':
                 rebufferCount += 1
                 playingTime   += (e['time'] - lastTime)
                 lastTime       = e['time']
                 mode           = 'buffering'
-                if (lastTime - lastQualityStartsAT) > 0:
-                    bEvents.append(str(round((lastTime - lastQualityStartsAT) / 1000.0, 3)) + ' seconds later after the previous quality change, buffering starts')
-                # ELSE, this is the start of the video
-                else:
-                    bEvents.append('Start buffering')
+                bEvents.append('Starts buffering : ' + str(round((e['time'] - initialTime)/1000.0, 3)))
             elif e['event'] == 'PLAYING':
                 bufferingTime += (e['time'] - lastTime)
-                bEvents.append('Video buffered for ' + str(round((e['time'] - lastTime) / 1000.0, 3)) + ' seconds')
+                bEvents.append('Starts playing : ' + str(round((e['time'] - initialTime)/1000.0, 3)))
                 lastTime       = e['time']
                 mode           = 'playing'
 
