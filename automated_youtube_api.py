@@ -259,7 +259,7 @@ def main():
     userID = random_ascii_by_size(10)
 
     # Whether do tcpdump
-    doDumps = True
+    doDumps = False
     # Wether draw event graph for each test
     doGraphs = True
     # Running time for each video
