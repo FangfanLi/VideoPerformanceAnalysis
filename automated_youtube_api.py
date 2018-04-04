@@ -17,13 +17,14 @@ Example usage:
     python automated_youtube_api.py [Network] [YES or NO] [Chrome OR Firefox]
 '''
 
-import time, sys, os, random, string, subprocess, urllib2, json,urllib, numpy
+import time, sys, os, random, string, subprocess, urllib2, json, urllib, numpy
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
 from urllib2 import urlopen
 from BeautifulSoup import BeautifulSoup
+import matplotlib.pyplot as plt
 
 
 '''
@@ -68,6 +69,76 @@ class analyzerI(object):
 
         res = urllib2.urlopen(req).read()
         return json.loads(res)
+
+def drawQualityChangeGraph(bevents, endtime, filename):
+    fig, ax = plt.subplots()
+    plt.ylim((0, 6.5))
+
+    plt.xlim((0, endtime))
+
+    quality2y = {'tiny': 1, 'small': 2, 'medium': 3, 'large': 4, 'hd720': 5, 'hd1080': 6}
+
+    # The data always starts with buffering events and the second event should be quality change.
+    # Otherwise, it is malformed and should be filtered on the server
+
+    currQuality = bevents[1].split(' : ')[1].split(' : ')[0]
+    Buffering = True
+
+    # bufferingLines represent when the video was buffering
+    bufferingLines = []
+    # playingLines represent when the video was playing
+    playingLines = []
+    # For each pair of events that happened during the streaming (except the last one, which is a special case)
+    # There are the following possibilities
+    for index in xrange(len(bevents)):
+        event = bevents[index]
+        # The next event
+        if index == len(bevents) - 1:
+            ntimeStamp = endtime
+        else:
+            ntimeStamp = float(bevents[index + 1].split(' : ')[-1])
+        # If this event is buffering
+        # Independent of the next event, add an additional line for this buffering event
+        if 'Buffering' in event:
+            Buffering = True
+            timeStamp = float(event.split(' : ')[-1])
+            bufferingLines.append(([timeStamp, ntimeStamp], [quality2y[currQuality], quality2y[currQuality]]))
+
+        elif 'Quality change' in event:
+            newQuality = event.split(' : ')[1]
+            timeStamp = float(event.split(' : ')[-1])
+            # Need to add a vertical line from currQuality to newQuality
+            # Then a horizontal line until next event
+            if Buffering:
+                bufferingLines.append(([timeStamp, timeStamp], [quality2y[currQuality], quality2y[newQuality]]))
+                bufferingLines.append(([timeStamp, ntimeStamp], [quality2y[newQuality], quality2y[newQuality]]))
+            else:
+                playingLines.append(([timeStamp, timeStamp], [quality2y[currQuality], quality2y[newQuality]]))
+                playingLines.append(([timeStamp, ntimeStamp], [quality2y[newQuality], quality2y[newQuality]]))
+            # update current quality
+            currQuality = newQuality
+
+        else:
+            # An additional line for playing event
+            Buffering = False
+            timeStamp = float(event.split(' : ')[-1])
+            playingLines.append(([timeStamp, ntimeStamp], [quality2y[currQuality], quality2y[currQuality]]))
+
+    for bufferingLine in bufferingLines:
+        x1x2 = bufferingLine[0]
+        y1y2 = bufferingLine[1]
+        plt.plot(x1x2, y1y2, 'k-', color='r', linewidth=3)
+
+    for playingLine in playingLines:
+        x1x2 = playingLine[0]
+        y1y2 = playingLine[1]
+        plt.plot(x1x2, y1y2, 'k-', color='b')
+
+    ax.set_yticklabels(['', 'tiny', 'small', 'medium', 'large', '720P', '1080P'])
+
+    plt.title(filename.split('/')[-1])
+
+    plt.savefig(filename + '.png')
 
 def getQualityPercentage(qualities):
     rQualities = {}
@@ -184,16 +255,17 @@ def main():
     # This list contains the videoIDs to be tested, can be replaced with the top 50 list
 
     videoIDs = getTopYoutubeVideoIDs(1)
-
     # unique for a set of tests
     userID = random_ascii_by_size(10)
 
     # Whether do tcpdump
-    doDumps = False
+    doDumps = True
+    # Wether draw event graph for each test
+    doGraphs = True
     # Running time for each video
     stoptime = '30'
     # Rounds of test for each video
-    rounds = 5
+    rounds = 1
 
     if browser == 'Chrome':
         # userDir       = 'UserDir'
@@ -234,6 +306,7 @@ def main():
         ['videoID', 'initialQuality', 'endQuality', 'timeInDiffQualities', 'timeToStartPlaying', 'qualityChangeCount', 'rebufferCount',
          'finalFractionLoaded', 'bufferingTimeFrac', 'bufferingTime', 'playingTime'])
 
+    # results is keyed by videoID
     for q in sorted(results.keys()):
         iQualities = getQualityPercentage(results[q]['initialQuality'])
         eQualities = getQualityPercentage(results[q]['endQuality'])
@@ -250,6 +323,20 @@ def main():
                                  ]))
 
         print '\r\n All quality change and buffering events ', results[q]['bEvents'], '\r\n'
+        if doGraphs:
+            currdir = os.getcwd()
+            dirName = currdir + '/graphs/' + userID + '/'
+            # make directory for
+            if not os.path.isdir(dirName):
+                os.makedirs(dirName)
+            graphTitle = '{}_{}_{}_{}'.format(network, tether, browser, q)
+            count = 0
+
+            for bevents in results[q]['bEvents']:
+                filename = dirName + graphTitle + '_' + str(count) + '.png'
+                drawQualityChangeGraph(bevents, float(stoptime), filename)
+                count += 1
+
 
 if __name__ == "__main__":
     main()

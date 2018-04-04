@@ -82,16 +82,16 @@ def analyzeQoE(dir):
                 diffQualitiesPeriod[endQuality] += round(etime/1000.0, 3)
                 endQuality     = e['event.data']
                 qualityChangeCount += 1
-                bEvents.append('Quality changes to ' + endQuality + ' : ' + str(round((e['time'] - initialTime)/1000.0, 3)))
+                bEvents.append('Quality change : ' + endQuality + ' : ' + str(round((e['time'] - initialTime)/1000.0, 3)))
             elif e['event'] == 'BUFFERING':
                 rebufferCount += 1
                 playingTime   += (e['time'] - lastTime)
                 lastTime       = e['time']
                 mode           = 'buffering'
-                bEvents.append('Starts buffering : ' + str(round((e['time'] - initialTime)/1000.0, 3)))
+                bEvents.append('Buffering : ' + str(round((e['time'] - initialTime)/1000.0, 3)))
             elif e['event'] == 'PLAYING':
                 bufferingTime += (e['time'] - lastTime)
-                bEvents.append('Starts playing : ' + str(round((e['time'] - initialTime)/1000.0, 3)))
+                bEvents.append('Playing : ' + str(round((e['time'] - initialTime)/1000.0, 3)))
                 lastTime       = e['time']
                 mode           = 'playing'
 
