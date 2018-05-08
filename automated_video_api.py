@@ -13,9 +13,9 @@ stoptime default 10, how many seconds the video plays
 
 rounds default 5, how many rounds of test to perform for each video
 
-Inputs are 1. the network being tested 2. Whether you are tethered 3. The browser used for testing
+Inputs are 1. the network being tested 2. Whether you are tethered 3. The browser used for testing  4. The video streaming serivce
 Example usage:
-    python automated_youtube_api.py [Network] [YES or NO] [Chrome OR Firefox]
+    python automated_youtube_api.py [Network] [YES or NO] [Chrome OR Firefox] [youtube or vimeo]
 '''
 
 import time, sys, os, random, string, subprocess, urllib2, json, urllib, numpy
