@@ -64,6 +64,7 @@ This will send stats as a json file to a server. Minimal server:
 	  	var desiredQuality 	= args.quality;
 	  	var userID 			= args.userID;
 	  	var testID 			= args.testID;
+	  	var contentprovider = args.contentprovider;
 
 	  	if (userID) {
 		  	console.log('userID:', userID);
@@ -93,7 +94,9 @@ This will send stats as a json file to a server. Minimal server:
 		var started 		 = false;
 		var stopped 		 = false;
 		// This is the server that this page sends analysis results to
-		var ncServer		 = "http://replay-test-2.meddle.mobi:55556/";
+		// var ncServer		 = "http://replay-test-2.meddle.mobi:55556/";
+		// var ncServer = "http://128.119.245.77:55556"
+		var ncServer = "http://localhost:55556"
 		var lat;
 		var lon;
 		getLocation()
@@ -281,6 +284,7 @@ This will send stats as a json file to a server. Minimal server:
       			  		   'videoID'  : desiredVideoId,
       			  		   'network'  : network,
       			  		   'desiredQuality' : desiredQuality,
+      			  		   'contentprovider': contentprovider,
       			  	   	   'events'   : events
       			  	  	};
 
@@ -302,23 +306,42 @@ This will send stats as a json file to a server. Minimal server:
     		  			'event.data'			: event.data,
     		  			'VideoLoadedFraction'	: player.getVideoLoadedFraction(),
     		  		});
+    	  
       }
 
       function sendResults(results) {
-    	  console.log('Sending events ...');
-    	  localStorage.setItem("status", 'done');
+        console.log('Sending events ...');
+        console.log(results);
+        localStorage.setItem("status", 'done');
 
-    	  var xmlHttp = new XMLHttpRequest();
+        var xmlHttp = new XMLHttpRequest();
 
-    	  try {
-    		  xmlHttp.open("POST", ncServer, false);
-	    	  xmlHttp.send(JSON.stringify(results) + "\n");
-    		  }
-    	  catch(err) {
-    		  console.log('Error:'.concat(err.message));
-    		  return;
-    		  }
+        try {
+           xmlHttp.open("POST", ncServer, false);
+           xmlHttp.send(JSON.stringify(results) + "\n");
+           }
+         catch(err) {
+           console.log('Error:'.concat(err.message));
+           return;
+           }
       }
+
+
+      // function sendResults(results) {
+    	 //  console.log('Sending events ...');
+    	 //  localStorage.setItem("status", 'done');
+
+    	 //  var xmlHttp = new XMLHttpRequest();
+
+    	 //  try {
+    		//   xmlHttp.open("POST", ncServer+'/test/', false);
+	    	//   xmlHttp.send(JSON.stringify(results) + "\n");
+    		//   }
+    	 //  catch(err) {
+    		//   console.log('Error:'.concat(err.message));
+    		//   return;
+    		//   }
+      // }
 
       function createUserID()
       {
