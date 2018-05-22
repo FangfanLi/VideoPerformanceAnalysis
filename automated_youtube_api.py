@@ -202,8 +202,9 @@ def getTopYoutubeVideoIDs(n):
 def random_ascii_by_size(size):
     return ''.join(random.choice(string.ascii_letters + string.digits) for x in range(size))
 
-def runOne(tether, stoptime, network, quality, videoID=None, driver=None, userID=None, testID=None, doDumps=False):
-    url = 'http://www.ccs.neu.edu/home/fangfanli/youtubePlayerStats.html?tether={}&stoptime={}&network={}&quality={}&videoID={}'.format(tether, stoptime, network, quality,videoID)
+def runOne(tether, stoptime, network, quality, videoID=None, driver=None, userID=None, testID=None, doDumps=True):
+#   url = 'http://www.ccs.neu.edu/home/fangfanli/youtubePlayerStats.html?tether={}&stoptime={}&network={}&quality={}&videoID={}'.format(tether, stoptime, network, quality,videoID)
+    url = 'http://localhost/youtubePlayerStats.html?tether={}&stoptime={}&network={}&quality={}&videoID={}'.format(tether, stoptime, network, quality,videoID)
 
     if userID:
         url += '&userID=' + userID
@@ -254,7 +255,7 @@ def main():
 
     # This list contains the videoIDs to be tested, can be replaced with the top 50 list
 
-    videoIDs = getTopYoutubeVideoIDs(1)
+    videoIDs = getTopYoutubeVideoIDs(10)
     # unique for a set of tests
     userID = random_ascii_by_size(10)
 
@@ -276,10 +277,12 @@ def main():
         #     chromeOptions.add_argument(o)
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--enable-quic")
-        driver = webdriver.Chrome('/Users/neufan/Downloads/chromedriver', chrome_options = chrome_options)
+#       driver = webdriver.Chrome('/Users/neufan/Downloads/chromedriver', chrome_options = chrome_options)
+	driver = webdriver.Chrome('/home/lif/tools/webdriver/chromedriver', chrome_options = chrome_options)
 
     elif browser == 'Firefox':
-        driver = webdriver.Firefox(executable_path='/Users/neufan/Downloads/geckodriver')
+#       driver = webdriver.Firefox(executable_path='/Users/neufan/Downloads/geckodriver')
+	driver = webdriver.Chrome('/Users/neufan/Downloads/chromedriver', chrome_options = chrome_options)
     else:
         print '\r\n Please specify a valid browser to us [Chrome OR Firefox]'
         sys.exit(-1)
@@ -296,7 +299,8 @@ def main():
     if driver:
         driver.quit()
     # analyzerI
-    analyzer = analyzerI('replay-test-2.meddle.mobi',55556)
+    #analyzer = analyzerI('replay-test-2.meddle.mobi',55556)
+    analyzer = analyzerI('localhost',55556)
     results = analyzer.getSingleResult(userID)
     results = results['response']
 

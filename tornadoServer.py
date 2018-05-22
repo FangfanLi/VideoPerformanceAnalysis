@@ -183,7 +183,7 @@ class Handler(tornado.web.RequestHandler):
 
 
 
-resultsFolder = '/home/ubuntu/youtubePlayer_results/'
+resultsFolder = '/home/lif/traces/youtubePlayer_results/'
 os.system('mkdir -p {}'.format(resultsFolder))
 
 application = tornado.web.Application([(r"/", Handler),])
