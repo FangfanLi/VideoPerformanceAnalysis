@@ -10,11 +10,13 @@
 		<script>
 			function onSubmit() {
 				var network = $('#network').val();
+				var videoid = $('#videoId').val();
 				var tether  = $('#tether > .btn.active').text();
 				var stoptime= $('#stoptime > .btn.active').text();
 				var quality = $('#quality > .btn.active').text();
-				var newUrl  = [	"http://localhost/youtubePlayerStats.html?",
+				var newUrl  = [	"http://10.2.40.169/youtubePlayerStats.html?",
 								"&tether="  , tether,
+								"&videoID=" , videoid,
 								"&stoptime=", stoptime,
 								"&network=" , network,
 								"&quality=" , quality];
@@ -41,6 +43,12 @@
 		<div>
 			<label class="control-label" for="network">Network:</label>
 			<input type="text" class="form-control" id="network" placeholder="Wifi? Tmobile? Verizon?">
+		</div>
+	</div>
+	<div class="form-group">
+		<div>
+			<label class="control-label" for="videoId">VideoID:</label>
+			<input type="text" class="form-control" id="videoId" placeholder="WNCl-69POro">
 		</div>
 	</div>
 	<div class="form-group">

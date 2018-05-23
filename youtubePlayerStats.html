@@ -55,6 +55,7 @@ This will send stats as a json file to a server. Minimal server:
 	var desiredQuality	= args.quality;
 	var userID		= args.userID;
 	var testID		= args.testID;
+	var videoID		= args.videoID;
 
 	if (userID) {
 		console.log('userID:', userID);
@@ -85,7 +86,7 @@ This will send stats as a json file to a server. Minimal server:
 	var stopped		 = false;
 	// This is the server that this page sends analysis results to
 	//var ncServer		 = "http://replay-test-2.meddle.mobi:55556/";
-	var ncServer		 = "http://localhost:55556/";
+	var ncServer		 = "http://10.2.40.169:55556/";
 	var lat;
 	var lon;
 	getLocation()
@@ -145,7 +146,7 @@ This will send stats as a json file to a server. Minimal server:
 			height	: desiredheight.toString(),
 			videoId	: desiredVideoId,
 			suggestedQuality: desiredQuality,
-			playerVars: {'controls': 1, 'enablejsapi' : 1, 'origin' : 'http://localhost'},
+			playerVars: {'controls': 1, 'enablejsapi' : 1, 'origin' : 'http://10.2.40.169'},
 			events	: {
 				  'onReady': onPlayerReady,
 				  'onStateChange': onPlayerStateChange,
@@ -303,7 +304,7 @@ This will send stats as a json file to a server. Minimal server:
 	}
 
       	function onMoreTests() {
-		window.location = "http://localhost/testPage.html";
+		window.location = "http://10.2.40.169/testPage.html";
 	};
 
 	function showResults(events) {

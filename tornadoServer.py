@@ -31,10 +31,11 @@ playing Time (averaged)
 def analyzeQoE(dir):
     results = {}
 
+    if os.path.isdir(dir) == False :
+	os.makedirs(dir)        
+
     for file in os.listdir(dir):
-
         res = json.load(open(os.path.abspath(dir) + '/' + file, 'r'))
-
         # Sanity check, first event should be 'UNSTARTED', second event should be 'BUFFERING', third event should be 'QualityChange'
         # Otherwise, ignore this data point
         if res['events'][0]['event'] != 'UNSTARTED' or res['events'][1]['event'] != 'BUFFERING' or res['events'][2]['event'] != 'QualityChange':
