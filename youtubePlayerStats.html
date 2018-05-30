@@ -79,14 +79,16 @@ This will send stats as a json file to a server. Minimal server:
 	var testID = parseInt(localStorage.getItem("testID")) + 1;
 	localStorage.setItem("testID", testID.toString());
 
-	var datetime		 = new Date().toGMTString('');
+	var datetime		= new Date().toGMTString('');
 	// events contains the QoE info, such as Paused, Buffering, Quality Changes etc.
-	var events			 = [];
-	var started		 = false;
-	var stopped		 = false;
+	var events		= [];
+	var started		= false;
+	var stopped		= false;
 	// This is the server that this page sends analysis results to
-	//var ncServer		 = "http://replay-test-2.meddle.mobi:55556/";
-	var ncServer		 = "http://10.2.40.169:55556/";
+	//var ncServer		= "http://replay-test-2.meddle.mobi:55556/";
+	var ncServer		= "http://10.2.40.169:55556/";
+	var useTimer		= true;
+	var done		= false;
 	var lat;
 	var lon;
 	getLocation()
@@ -99,6 +101,10 @@ This will send stats as a json file to a server. Minimal server:
 
 	if (!desiredVideoId){
 		var desiredVideoId = 'D6tC1pyrsTM';
+	}
+
+	if (stopTime == 0 ) {
+		useTimer = false;
 	}
 
 	/*
@@ -172,12 +178,12 @@ This will send stats as a json file to a server. Minimal server:
 		return
 	}
 
-      	function onPlayerReady(event) {
+	function onPlayerReady(event) {
 		//event.target.playVideo();
 		//event.target.loadVideoById("x1QTc5YeO6w", 0, "hd720");
 		/*
 		event.target.loadVideoById({videoId:"x1QTc5YeO6w",
-					    suggestedQuality:"hd720"}); 
+					    suggestedQuality:"hd720"});
 		*/
 		//event.target.mute();
 	}
@@ -188,7 +194,7 @@ This will send stats as a json file to a server. Minimal server:
 			// After the video is stopped, two state changes are fired,
 			// an UNSTARTED followed by an CUED. This is to ignore those.
 			return;
-	    	}
+		}
 
 		switch (event.data) {
 		case -1:
@@ -201,14 +207,20 @@ This will send stats as a json file to a server. Minimal server:
 
 		case YT.PlayerState.ENDED:
 			pushEvent('ENDED', event);
+			done = true;
+			setTimeOut(stopVideo, 1000);
 			break;
 
 		case YT.PlayerState.PLAYING:
 			pushEvent('PLAYING', event);
-			if (!started) {
+			if (useTimer && !started) {
 				setTimeout(stopVideo, stopTime);
 				document.getElementById("countdown").style.display  = 'block';
 				countdown(stopTime);
+				started = true;
+			}
+
+			if (!useTimer) {
 				started = true;
 			}
 			break;
@@ -269,7 +281,7 @@ This will send stats as a json file to a server. Minimal server:
 
 		sendResults(results);
 	}
-      
+
 	function pushEvent(eventName, event) {
 		var currentTime = new Date().getTime();
 		events.push({	'time'		: currentTime,
@@ -279,7 +291,7 @@ This will send stats as a json file to a server. Minimal server:
 			});
 	}
 
-      	function sendResults(results) {
+	function sendResults(results) {
 		console.log('Sending events ...');
 		localStorage.setItem("status", 'done');
 
@@ -303,7 +315,7 @@ This will send stats as a json file to a server. Minimal server:
 		return userID;
 	}
 
-      	function onMoreTests() {
+	function onMoreTests() {
 		window.location = "http://10.2.40.169/testPage.html";
 	};
 

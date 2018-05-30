@@ -255,7 +255,7 @@ def main():
 
     # This list contains the videoIDs to be tested, can be replaced with the top 50 list
 
-    videoIDs = getTopYoutubeVideoIDs(10)
+    videoIDs = getTopYoutubeVideoIDs(1)
     # unique for a set of tests
     userID = random_ascii_by_size(10)
 
@@ -300,7 +300,7 @@ def main():
         driver.quit()
     # analyzerI
     #analyzer = analyzerI('replay-test-2.meddle.mobi',55556)
-    analyzer = analyzerI('localhost',55556)
+    analyzer = analyzerI('10.2.40.169',55556)
     results = analyzer.getSingleResult(userID)
     results = results['response']
 
@@ -337,7 +337,7 @@ def main():
             count = 0
 
             for bevents in results[q]['bEvents']:
-                filename = dirName + graphTitle + '_' + str(count) + '.png'
+                filename = dirName + graphTitle + '_' + str(count) 
                 drawQualityChangeGraph(bevents, float(stoptime), filename)
                 count += 1
 
