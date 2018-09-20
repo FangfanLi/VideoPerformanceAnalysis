@@ -26,6 +26,7 @@ from urllib2 import urlopen
 from BeautifulSoup import BeautifulSoup
 import matplotlib.pyplot as plt
 
+import argparse
 
 '''
 Get the video IDs of the top n Youtube videos from Wikipedia
@@ -35,10 +36,12 @@ Input : n
 Output : a list of n most viewed Youtube video IDs 
 '''
 
+
 class analyzerI(object):
     '''
     This class contains all the methods to interact with the analyzer server
     '''
+
     def __init__(self, ip, port):
         self.path = ('http://'
                      + ip
@@ -50,9 +53,10 @@ class analyzerI(object):
         Send a GET request to get result for a given userID
         '''
         # userID specifies the test
-        data = {'userID':userID}
+        data = {'userID': userID}
+        print('data type', data, type(data))
 
-        res = self.sendRequest('GET',data=data)
+        res = self.sendRequest('GET', data=data)
         return res
 
     def sendRequest(self, method, data=''):
@@ -65,10 +69,11 @@ class analyzerI(object):
             req = urllib2.Request(self.path + '?' + data)
 
         elif method.upper() == 'POST':
-            req  = urllib2.Request(self.path, data)
+            req = urllib2.Request(self.path, data)
 
         res = urllib2.urlopen(req).read()
         return json.loads(res)
+
 
 def drawQualityChangeGraph(bevents, endtime, filename):
     fig, ax = plt.subplots()
@@ -140,6 +145,7 @@ def drawQualityChangeGraph(bevents, endtime, filename):
 
     plt.savefig(filename + '.png')
 
+
 def getQualityPercentage(qualities):
     rQualities = {}
     for quality in qualities:
@@ -149,9 +155,10 @@ def getQualityPercentage(qualities):
             rQualities[quality] = 1
 
     for quality in rQualities:
-        rQualities[quality] = "{0:.2f}".format(float(rQualities[quality])/float(len(qualities)))
+        rQualities[quality] = "{0:.2f}".format(float(rQualities[quality]) / float(len(qualities)))
 
     return rQualities
+
 
 def getQualityPeriod(multiTestsQualities):
     rQualities = {}
@@ -163,9 +170,10 @@ def getQualityPeriod(multiTestsQualities):
             rQualities[quality] += singleTestQualities[quality]
 
     for quality in rQualities:
-        rQualities[quality] = round(rQualities[quality]/float(numTests),2)
+        rQualities[quality] = round(rQualities[quality] / float(numTests), 2)
 
     return rQualities
+
 
 def getTopYoutubeVideoIDs(n):
     if n > 100:
@@ -180,7 +188,7 @@ def getTopYoutubeVideoIDs(n):
 
     allIDs = []
 
-    for ind in xrange(1, n+1):
+    for ind in xrange(1, n + 1):
         video = allVideo[ind]
         td = video.findAll("td")[1]
         # print '\r\n td', td
@@ -202,9 +210,14 @@ def getTopYoutubeVideoIDs(n):
 def random_ascii_by_size(size):
     return ''.join(random.choice(string.ascii_letters + string.digits) for x in range(size))
 
-def runOne(tether, stoptime, network, quality, videoID=None, driver=None, userID=None, testID=None, doDumps=False):
-    url = 'http://www.ccs.neu.edu/home/fangfanli/youtubePlayerStats.html?tether={}&stoptime={}&network={}&quality={}&videoID={}'.format(tether, stoptime, network, quality,videoID)
 
+def runOne(filesDir, tether, stoptime, network, quality, analyzer, videoID=None, driver=None, userID=None, testID=None, doDumps=False):
+    # run a simple python HTTP server via 'python -m SimpleHTTPServer'
+    url = 'http://'+analyzer+':8000/youtubePlayerStats.html?tether={}&stoptime={}&network={}&quality={}&videoID={}&analyzer={}'.format(tether,
+                                                                                                                 stoptime,
+                                                                                                                 network,
+                                                                                                                 quality,
+                                                                                                                 videoID, analyzer)
     if userID:
         url += '&userID=' + userID
     if testID:
@@ -212,14 +225,13 @@ def runOne(tether, stoptime, network, quality, videoID=None, driver=None, userID
 
     # If doDumps = True, record the traces when testing
     if doDumps:
-        currdir = os.getcwd()
-        dirName = currdir + '/tcpdumps/' + userID + '/'
+        dirName = filesDir + userID +'/'
         # make directory for
         if not os.path.isdir(dirName):
             os.makedirs(dirName)
         dumpName = 'dump_youtubeAPI_{}_{}_{}_{}.pcap'.format(userID, network, videoID, testID)
-        command  = ['sudo','tcpdump', '-nn', '-B', str(131072), '-w', dirName + dumpName]
-        pID      = subprocess.Popen(command)
+        command = ['tcpdump', '-nn', '-w', dirName + dumpName]
+        pID = subprocess.Popen(command)
 
     driver.get(url)
 
@@ -240,32 +252,61 @@ def runOne(tether, stoptime, network, quality, videoID=None, driver=None, userID
         pID.terminate()
 
 
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+def parseInputs(parser):
+    parser.add_argument('--network',
+                        help='the network being tested (e.g., WiFi, Verizon)', required=True)
+    parser.add_argument('--browser',
+                        help='the browser to use', required=True)
+    parser.add_argument('--analyzer',
+                        help='the location of the analyzer, default localhost', default='localhost')
+    parser.add_argument('--doDumps', type=str2bool, nargs='?',
+                        help='whether do TCPDUMP, default True', default=True)
+    parser.add_argument('--doGraphs', type=str2bool, nargs='?',
+                        help='whether draw graphs, default True', default=True)
+    parser.add_argument('--stoptime', type=int,
+                        help='the playing time for each video, default 10', default=10)
+    parser.add_argument('--rounds', type=int,
+                        help='rounds of tests for each video, default 1', default=1)
+    parser.add_argument('--numVideo', type=int,
+                        help='number of videos to test from the top list, default 1', default=1)
+    parser.add_argument('--tether', type=str2bool, nargs='?',
+                        help='whether tests are running with tethering, default False', default=False)
 
 def main():
-    try:
-        network  = sys.argv[1]
-        tether = sys.argv[2]
-        browser = sys.argv[3]
-    except:
-        print '\r\n Please provide two inputs : [the network being tested (e.g. WiFi?)] [are you tethered (YES or NO)] [which browser to use (Firefox or Chrome)]'
-        sys.exit(-1)
+
+    parser = argparse.ArgumentParser(description='the specification for running tests')
+    parseInputs(parser)
+    args = parser.parse_args()
+
     # qualities = ["hd2160", "hd1440", "hd1080", "hd720", "large", "medium", "small", "tiny", "auto"]
     quality = 'auto'
 
     # This list contains the videoIDs to be tested, can be replaced with the top 50 list
 
-    videoIDs = getTopYoutubeVideoIDs(1)
+    videoIDs = getTopYoutubeVideoIDs(args.numVideo)
     # unique for a set of tests
     userID = random_ascii_by_size(10)
-
-    # Whether do tcpdump
-    doDumps = False
+    network = args.network
+    analyzer = args.analyzer
+    doDumps = args.doDumps
     # Wether draw event graph for each test
-    doGraphs = True
+    doGraphs = args.doGraphs
     # Running time for each video
-    stoptime = '30'
+    stoptime = str(args.stoptime)
     # Rounds of test for each video
-    rounds = 1
+    rounds = args.rounds
+    browser = args.browser
+    tether = args.tether
+
+    filesDir = '/Users/neufan/Project/VideoPerformanceAnalysis/youtubePlayer_results/'
 
     if browser == 'Chrome':
         # userDir       = 'UserDir'
@@ -276,35 +317,35 @@ def main():
         #     chromeOptions.add_argument(o)
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--enable-quic")
-        driver = webdriver.Chrome('/Users/neufan/Downloads/chromedriver', chrome_options = chrome_options)
+        driver = webdriver.Chrome('/Users/neufan/Downloads/chromedriver', chrome_options=chrome_options)
 
     elif browser == 'Firefox':
         driver = webdriver.Firefox(executable_path='/Users/neufan/Downloads/geckodriver')
     else:
-        print '\r\n Please specify a valid browser to us [Chrome OR Firefox]'
+        print('\r\n Please specify a valid browser to us [Chrome OR Firefox]')
         sys.exit(-1)
-
-    # runOne(name, stoptime, network, 'auto', driver=driver, userID=userID, testID=testID, doDumps=doDumps)
 
     for i in range(rounds):
         for videoID in videoIDs:
             testID = str(i)
-            print '\t'.join(map(str, [testID, quality, network, browser, userID, videoID]))
-            runOne(tether, stoptime, network, quality, videoID=videoID, driver=driver, userID=userID, testID=testID, doDumps=doDumps)
+            print('\t'.join(map(str, [testID, quality, network, browser, userID, videoID])))
+            runOne(filesDir, tether, stoptime, network, quality, analyzer, videoID=videoID, driver=driver, userID=userID, testID=testID,
+                   doDumps=doDumps)
             time.sleep(3)
 
     if driver:
         driver.quit()
-    # analyzerI
-    analyzer = analyzerI('replay-test-2.meddle.mobi',55556)
+    analyzer = analyzerI(analyzer, 55556)
+    print('\r\n userID get result', userID)
     results = analyzer.getSingleResult(userID)
     results = results['response']
 
-    print '\r\n Summary:'
+    print('\r\n Summary:')
 
-    print '\t & '.join(
-        ['videoID', 'initialQuality', 'endQuality', 'timeInDiffQualities', 'timeToStartPlaying', 'qualityChangeCount', 'rebufferCount',
-         'finalFractionLoaded', 'bufferingTimeFrac', 'bufferingTime', 'playingTime'])
+    print('\t & '.join(
+        ['videoID', 'initialQuality', 'endQuality', 'timeInDiffQualities', 'timeToStartPlaying', 'qualityChangeCount',
+         'rebufferCount',
+         'finalFractionLoaded', 'bufferingTimeFrac', 'bufferingTime', 'playingTime']))
 
     # results is keyed by videoID
     for q in sorted(results.keys()):
@@ -312,23 +353,19 @@ def main():
         eQualities = getQualityPercentage(results[q]['endQuality'])
         dQualities = getQualityPeriod(results[q]['multiTestsQualities'])
 
-        print '\t & '.join(map(str, [q, iQualities, eQualities, dQualities,
-                                 round(numpy.average(results[q]['timeToStartPlaying'])/1000.0, 2),
-                                 round(numpy.average(results[q]['qualityChangeCount']), 2),
-                                 round(numpy.average(results[q]['rebufferCount']), 2),
-                                 str(round(numpy.average(results[q]['finalFractionLoaded']), 2) * 100) + '%',
-                                 str(round(numpy.average(results[q]['bufferingTimeFrac']), 2)) + '%',
-                                 round(numpy.average(results[q]['bufferingTime']), 2),
-                                 round(numpy.average(results[q]['playingTime']), 2)
-                                 ]))
+        print('\t & '.join(map(str, [q, iQualities, eQualities, dQualities,
+                                     round(numpy.average(results[q]['timeToStartPlaying']) / 1000.0, 2),
+                                     round(numpy.average(results[q]['qualityChangeCount']), 2),
+                                     round(numpy.average(results[q]['rebufferCount']), 2),
+                                     str(round(numpy.average(results[q]['finalFractionLoaded']), 2) * 100) + '%',
+                                     str(round(numpy.average(results[q]['bufferingTimeFrac']), 2)) + '%',
+                                     round(numpy.average(results[q]['bufferingTime']), 2),
+                                     round(numpy.average(results[q]['playingTime']), 2)
+                                     ])))
 
-        print '\r\n All quality change and buffering events ', results[q]['bEvents'], '\r\n'
+        print('\r\n All quality change and buffering events ', results[q]['bEvents'], '\r\n')
         if doGraphs:
-            currdir = os.getcwd()
-            dirName = currdir + '/graphs/' + userID + '/'
-            # make directory for
-            if not os.path.isdir(dirName):
-                os.makedirs(dirName)
+            dirName = filesDir + userID + '/'
             graphTitle = '{}_{}_{}_{}'.format(network, tether, browser, q)
             count = 0
 

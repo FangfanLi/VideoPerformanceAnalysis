@@ -8,47 +8,49 @@ This will send stats as a json file to a server. Minimal server:
 <!DOCTYPE html>
 
 <html>
-	<head>
-	<meta charset="utf-8">
-	<!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
-	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	</head>
-  <body>
+<head>
+    <meta charset="utf-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body>
 
-    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+<!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
 
-    <div id="countdown" style="display:none"></div>
+<div id="countdown" style="display:none"></div>
 
-   	<!-- <div id="player" style="display:block; width:100%"></div> -->
-    <div id="player" style="display:block"></div>
+<!-- <div id="player" style="display:block; width:100%"></div> -->
+<div id="player" style="display:block"></div>
 
-   	<!-- <iframe id="player" style="display:block; width:100%" type="text/html" width="640" height="390" src="http://www.youtube.com/embed/P8WwazfHlhY?enablejsapi=1&origin=http://achtung.ccs.neu.edu" frameborder="0"></iframe> -->
+<!-- <iframe id="player" style="display:block; width:100%" type="text/html" width="640" height="390" src="http://www.youtube.com/embed/P8WwazfHlhY?enablejsapi=1&origin=http://achtung.ccs.neu.edu" frameborder="0"></iframe> -->
 
-    <div class="container">
-    <div  id="after" style="display:none" >
-	  	<form role="form">
-			<h3 align="center">Thank you!</h3>
-			<h3 align="center">Click below to do more tests :)</h3>
-    		<br>
-    		<button type="button" class="btn btn-default" style="width:100%" onclick="return onMoreTests();">Run more test!</button>
+<div class="container">
+    <div id="after" style="display:none">
+        <form role="form">
+            <h3 align="center">Thank you!</h3>
+            <h3 align="center">Click below to do more tests :)</h3>
+            <br>
+            <button type="button" class="btn btn-default" style="width:100%" onclick="return onMoreTests();">Run more
+                test!
+            </button>
 
-		<br><br><br>
-		<table class="table table-bordered" id="events">
-	    <thead>
-	      <tr>
-	        <th>Timestamp</th>
-	        <th>event</th>
-	        <th>data</th>
-	      </tr>
-	    </thead>
-	    <tbody>
-	    </tbody>
-	  </table>
+            <br><br><br>
+            <table class="table table-bordered" id="events">
+                <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>event</th>
+                    <th>data</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
 
-	</form>
-	</div>
+        </form>
+    </div>
     <script>
 		var args = {};
 		window.location.href.split('?')[1].split("&").forEach(function(part) {
@@ -64,6 +66,7 @@ This will send stats as a json file to a server. Minimal server:
 	  	var desiredQuality 	= args.quality;
 	  	var userID 			= args.userID;
 	  	var testID 			= args.testID;
+	  	var analyzer  = args.analyzer;
 
 	  	if (userID) {
 		  	console.log('userID:', userID);
@@ -93,7 +96,7 @@ This will send stats as a json file to a server. Minimal server:
 		var started 		 = false;
 		var stopped 		 = false;
 		// This is the server that this page sends analysis results to
-		var ncServer		 = "http://replay-test-2.meddle.mobi:55556/";
+		var ncServer		 = "http://" + analyzer + ":55556/";
 		var lat;
 		var lon;
 		getLocation()
@@ -311,6 +314,7 @@ This will send stats as a json file to a server. Minimal server:
     	  var xmlHttp = new XMLHttpRequest();
 
     	  try {
+    	      console.log('POSTING:   '.concat(ncServer));
     		  xmlHttp.open("POST", ncServer, false);
 	    	  xmlHttp.send(JSON.stringify(results) + "\n");
     		  }
@@ -358,8 +362,9 @@ This will send stats as a json file to a server. Minimal server:
 			}, 1000);
 		}
 
-      </script>
+
+    </script>
 </div>
-  </body>
+</body>
 
 </html>
