@@ -1,0 +1,27 @@
+Buffering : 0.0
+Quality change : v9 : 0.0
+Playing : 0.0
+Quality change : v12 : 9.0
+Quality change : v9 : 126.0
+Quality change : v12 : 127.0
+Quality change : v9 : 128.0
+Quality change : v12 : 129.0
+Quality change : v9 : 130.0
+Quality change : v12 : 131.0
+Quality change : v9 : 132.0
+Quality change : v12 : 133.0
+Quality change : v9 : 134.0
+Quality change : v12 : 135.0
+Quality change : v9 : 136.0
+Quality change : v12 : 137.0
+Quality change : v9 : 138.0
+Quality change : v12 : 139.0
+Quality change : v9 : 140.0
+Quality change : v12 : 141.0
+Quality change : v7 : 121.0
+Quality change : v12 : 122.0
+Quality change : v7 : 123.0
+Quality change : v12 : 124.0
+Quality change : v7 : 125.0
+Quality change : v12 : 126.0
+Quality change : v9 : 126.0

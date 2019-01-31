@@ -1,0 +1,5 @@
+Buffering : 0.0
+Quality change : 384x216 : 0.0
+Playing : 0.0
+Quality change : 480x270 : 43.0
+Quality change : 608x342 : 93.0

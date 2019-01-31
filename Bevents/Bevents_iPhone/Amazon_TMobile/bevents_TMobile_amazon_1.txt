@@ -1,0 +1,4 @@
+Buffering : 0.0
+Quality change : v8 : 0.0
+Playing : 0.0
+Quality change : v7 : 66.0

@@ -1,0 +1,6 @@
+Buffering : 0.0
+Quality change : 6 : 0.0
+Playing : 0.0
+Quality change : 5 : 3.0
+Quality change : 4 : 6.0
+Quality change : 6 : 12.0
